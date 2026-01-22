@@ -2,12 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  convertDotsToUnderscores,
-  getIndianEpochTimeFromWorldTimeAPI,
-  levelScore,
-} from "@/lib/utils";
-import { staticData } from "@/lib/staticdata";
 
 // Set 1 - The Odyssey
 import Level1 from "@/components/levels/L1";
@@ -82,55 +76,29 @@ const levels2 = [
 ];
 
 const Game = () => {
-  const [loading, setLoading] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
-  const [userDet, setUserDet] = useState({ CL: 1, CS: 0, S: 0 });
   const router = useRouter();
   const searchParams = useSearchParams();
   const set = searchParams.get("set") || "1";
   const levelParam = searchParams.get("level");
-  const userId = "guest-player";
 
   const isSet2 = set === "2";
   const maxLevels = isSet2 ? 16 : 15;
-  const currentLevelNum = levelParam ? parseInt(levelParam) : (userDet?.CL || 1);
+  const currentLevelNum = levelParam ? parseInt(levelParam) : 1;
 
-  const getUserId = () => {
-    return userId;
-  };
-
-  const handleLevelComplete = async () => {
+  const handleLevelComplete = () => {
     setTransitioning(true);
-    const userId = getUserId();
-    if (userId) {
-      await setScore(userId);
-      setTimeout(() => {
-        setTransitioning(false);
-      }, 2000);
-    }
-  };
-
-  const setScore = async (userId) => {
-    if (!userId) return;
-    setLoading(true);
-    try {
-      const updatedScore = await levelScore(
-        userDet?.CL || 0,
-        userDet?.CS || 0,
-        userDet?.S || 0
-      );
-      setUserDet({ CL: (userDet?.CL || 0) + 1, CS: 0, S: updatedScore });
-    } catch (error) {
-      console.error("Error setting score:", error);
-    } finally {
-      setLoading(false);
-    }
+    const nextLevel = currentLevelNum + 1;
+    
+    setTimeout(() => {
+      router.push(`/game?set=${set}&level=${nextLevel}`);
+    }, 1500);
   };
 
   useEffect(() => {
     // Initialize state with current level from query param
     if (levelParam) {
-      setUserDet({ CL: parseInt(levelParam), CS: 0, S: 0 });
+      // Just verify the level is valid
     }
   }, [levelParam]);
 
