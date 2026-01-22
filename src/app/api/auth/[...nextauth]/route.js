@@ -13,6 +13,12 @@ const handler = NextAuth({
       credentials: {},
       async authorize(credentials) {
         try {
+          // Check if auth is available
+          if (!auth) {
+            console.warn("Firebase auth not initialized");
+            return null;
+          }
+
           if (credentials.isFirebaseGoogleUser) {
             return {
               id: credentials.uid,
